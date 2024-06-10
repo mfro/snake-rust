@@ -83,6 +83,8 @@ impl std::ops::Neg for Offset {
 
 #[derive(Resource)]
 struct Game {
+    dead: bool,
+
     food: Option<SnakeFood>,
     player: Snake,
     tick_timer: Timer,
@@ -124,20 +126,22 @@ fn input(
     mut game: ResMut<Game>,
     mut exit: EventWriter<AppExit>,
 ) {
-    if input.just_pressed(KeyCode::ArrowUp) {
-        game.input_queue.push_back(Offset::new(0, -1));
-    }
-    if input.just_pressed(KeyCode::ArrowDown) {
-        game.input_queue.push_back(Offset::new(0, 1));
-    }
-    if input.just_pressed(KeyCode::ArrowRight) {
-        game.input_queue.push_back(Offset::new(1, 0));
-    }
-    if input.just_pressed(KeyCode::ArrowLeft) {
-        game.input_queue.push_back(Offset::new(-1, 0));
+    if !game.dead {
+        if input.just_pressed(KeyCode::ArrowUp) {
+            game.input_queue.push_back(Offset::new(0, -1));
+        }
+        if input.just_pressed(KeyCode::ArrowDown) {
+            game.input_queue.push_back(Offset::new(0, 1));
+        }
+        if input.just_pressed(KeyCode::ArrowRight) {
+            game.input_queue.push_back(Offset::new(1, 0));
+        }
+        if input.just_pressed(KeyCode::ArrowLeft) {
+            game.input_queue.push_back(Offset::new(-1, 0));
+        }
     }
 
-    if input.pressed(KeyCode::KeyR) {
+    if input.just_released(KeyCode::KeyR) {
         cleanup_game(&mut cmd, &*game);
         setup_game(cmd, transforms, spawner);
     }
@@ -154,7 +158,7 @@ fn update(
     mut game: ResMut<Game>,
     time: Res<Time>,
 ) {
-    if game.tick_timer.tick(time.delta()).just_finished() {
+    if !game.dead && game.tick_timer.tick(time.delta()).just_finished() {
         while let Some(next) = game.input_queue.pop_front() {
             if next != game.player.facing && next != -game.player.facing {
                 game.player.facing = next;
@@ -188,8 +192,7 @@ fn update(
             .count();
 
         if overlapping > 1 || is_out_of_bounds(next_position) {
-            cleanup_game(&mut cmd, &*game);
-            setup_game(cmd, transforms, spawner);
+            game.dead = true;
         }
     }
 }
@@ -260,6 +263,7 @@ fn cleanup_game(cmd: &mut Commands, game: &Game) {
 
 fn setup_game(mut cmd: Commands, mut transforms: Query<&mut Transform>, spawner: Res<Spawner>) {
     let mut game = Game {
+        dead: false,
         food: None,
         player: Snake {
             nodes: vec![],

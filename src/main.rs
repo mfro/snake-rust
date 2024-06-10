@@ -1,3 +1,3 @@
 fn main() {
-  mfro_snake::start();
+    mfro_snake::start();
 }
