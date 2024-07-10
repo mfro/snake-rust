@@ -1,5 +1,3 @@
-import * as __wbg_star0 from 'env';
-
 let wasm;
 
 const heap = new Array(128).fill(undefined);
@@ -537,11 +535,10 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper54983 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper54954 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 29317, __wbg_adapter_26);
         return addHeapObject(ret);
     };
-    imports['env'] = __wbg_star0;
 
     return imports;
 }
