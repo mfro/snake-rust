@@ -7,7 +7,23 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[profile.release]
+opt-level = "z"
+lto = "thin"
+
 [dependencies]
-bevy = "0.13.2"
 rand = "0.8.5"
 wasm-bindgen = "0.2.92"
+
+[dependencies.bevy]
+version = "0.13"
+default-features = false
+features = [
+  "webgl2",
+  "bevy_winit",
+  "bevy_sprite",
+]
+
+# https://github.com/Amanieu/parking_lot/issues/269
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+parking_lot_core = "=0.8.0"

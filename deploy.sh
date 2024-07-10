@@ -16,7 +16,7 @@ if [ ! -d "gh-pages" ]; then
   fi
 fi
 
-wasm-pack build --target web
+wasm-pack build --release --target web
 
 cd "gh-pages"
 git pull
